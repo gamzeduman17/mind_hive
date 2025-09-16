@@ -88,3 +88,4 @@ ios/build/
 # Metro bundler temp files
 .expo/
 *.expo
+.DS_Store
