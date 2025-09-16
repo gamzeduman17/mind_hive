@@ -1,0 +1,16 @@
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/bin/Debug/net8.0/MindHive.Application.deps.json
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/bin/Debug/net8.0/MindHive.Application.dll
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/bin/Debug/net8.0/MindHive.Application.pdb
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/bin/Debug/net8.0/MindHive.Domain.dll
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/bin/Debug/net8.0/MindHive.Domain.pdb
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/MindHive.Application.csproj.AssemblyReference.cache
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/MindHive.Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/MindHive.Application.AssemblyInfoInputs.cache
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/MindHive.Application.AssemblyInfo.cs
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/MindHive.Application.csproj.CoreCompileInputs.cache
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/MindHive.Application.sourcelink.json
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/MindHive.6464DB88.Up2Date
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/MindHive.Application.dll
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/refint/MindHive.Application.dll
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/MindHive.Application.pdb
+/Users/gamzeduman/Projects/mind_hive/MindHiveServer/MindHive.Application/obj/Debug/net8.0/ref/MindHive.Application.dll

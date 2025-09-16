@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "zjkDMJTljoXmbsNbJR/FP2IlzynzloTWPNtxLtBnRaA=",
+  "Source": "MindHive.API",
+  "BasePath": "_content/MindHive.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
