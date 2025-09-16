@@ -14,6 +14,11 @@ export default function HomeScreen() {
             </Text>
             <Button title="Go to Profile"
                 onPress={() => navigation.navigate(ROUTES.PROFILE)} />
+            <Button title="Settings" onPress={() => navigation.navigate(ROUTES.SETTINGS)} />
+            <View style={{ marginTop: 20 }}>
+                <Button title="Logout" color="red" onPress={() => navigation.replace(ROUTES.LOGIN)} />
+                {/* chat böyle yapmış dene !!!! onPress={() => navigation.replace("Login")} */}
+            </View>
         </View>
     )
 }

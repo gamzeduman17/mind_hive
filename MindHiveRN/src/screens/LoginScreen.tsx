@@ -1,18 +1,33 @@
 import React, { useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { Alert, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text, TextInput, Button, Checkbox } from "react-native-paper";
+import { ROUTES } from "../constants/routes";
 
 export default function LoginScreen({ navigation }: any) {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<{ userName?: string, password?: string }>({});
 
   const handleLogin = () => {
-    if (userName && password) {
-      navigation.navigate("Home");
-    } else {
+    let newErrors: any = {};
+    if (!userName.trim()) {
+      newErrors.userName = "Username is required";
+    }
+    if (!password.trim()) {
+      newErrors.userName = "Password is required";
+    }
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      return;
+    }
+    if (userName === "admin" && password === "1234") {
+      navigation.replace(ROUTES.HOME); // ✅ replace ile Login ekranı stack’ten silinir
+      // CHANGE LATER
       // Paper'ın Snackbar ya da AlertDialog ile daha modern hata mesajı da verebiliriz.
-      console.log("Please enter username and password");
+    } else {
+      Alert.alert("Login Failed", "Invalid username or password!");
     }
   };
 
@@ -32,20 +47,36 @@ export default function LoginScreen({ navigation }: any) {
       <TextInput
         label="Username"
         mode="outlined"
+        autoCapitalize="none"
+        autoCorrect={false}
         value={userName}
         onChangeText={setUserName}
         style={styles.input}
       />
+      {errors.userName && <Text style={styles.errorText}>{errors.userName}</Text>}
 
       {/* Password */}
-      <TextInput
-        label="Password"
-        mode="outlined"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        style={styles.input}
-      />
+      <View style={{ width: "100%", position: "relative" }}>
+        <TextInput
+          label="Password"
+          mode="outlined"
+          secureTextEntry={!showPassword}
+          value={password}
+          autoCapitalize="none"
+          autoCorrect={false}
+          onChangeText={setPassword}
+          style={styles.input}
+        />
+        <TouchableOpacity
+          style={[styles.eyeIcon, { position: "absolute", right: 10, top: 15 }]}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Text>{showPassword ? "Hide" : "Show"}</Text> 
+          {/* change with eye later */}
+        </TouchableOpacity>
+      </View>
+      {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+
 
       {/* Remember me + Forgot password */}
       <View style={styles.optionsRow}>
@@ -115,5 +146,13 @@ const styles = StyleSheet.create({
   loginButton: {
     marginTop: 10,
     paddingVertical: 5,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 10,
+  },
+  eyeIcon: {
+    padding: 5,
   },
 });
