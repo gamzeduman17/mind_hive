@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Alert, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text, TextInput, Button, Checkbox } from "react-native-paper";
 import { ROUTES } from "../constants/routes";
+import { login } from "../api/services/authService";
 
 export default function LoginScreen({ navigation }: any) {
   const [userName, setUserName] = useState("");
@@ -10,7 +11,7 @@ export default function LoginScreen({ navigation }: any) {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ userName?: string, password?: string }>({});
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     let newErrors: any = {};
     if (!userName.trim()) {
       newErrors.userName = "Username is required";
@@ -22,12 +23,12 @@ export default function LoginScreen({ navigation }: any) {
     if (Object.keys(newErrors).length > 0) {
       return;
     }
-    if (userName === "admin" && password === "1234") {
-      navigation.replace(ROUTES.HOME); // ✅ replace ile Login ekranı stack’ten silinir
-      // CHANGE LATER
-      // Paper'ın Snackbar ya da AlertDialog ile daha modern hata mesajı da verebiliriz.
-    } else {
-      Alert.alert("Login Failed", "Invalid username or password!");
+    try {
+      const result = await login(userName, password); 
+      Alert.alert("Success", `Welcome ${result.userName} (${result.role})`);
+      navigation.navigate("Home");
+    } catch (err: any) {
+      Alert.alert("Error", err.message || "Login failed");
     }
   };
 
