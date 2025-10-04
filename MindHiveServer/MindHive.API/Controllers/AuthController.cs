@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MindHive.Application.ApiServices;
+using MindHive.Application.DTOs.Auth;
+using MindHive.Application.DTOs.CommonModels;
 using MindHive.Domain.Entities;
 
 namespace MindHive.API.Controllers;
@@ -16,14 +18,20 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public IActionResult Login([FromBody] LoginRequestModel request)
     {
         if (_userService.Login(request.Username, request.Password, out User? user))
         {
-            return Ok(new { Message = "Login successful", Username = user.Username, Role = user.Role });
+            var data = new LoginResponseModel
+            {
+                Username = user.Username,
+                Role = user.Role
+            };
+
+            return Ok(BaseResponseModel<LoginResponseModel>.Ok(data, "Login successful"));
         }
 
-        return Unauthorized(new { Message = "Invalid username or password" });
+        return Unauthorized(BaseResponseModel<LoginResponseModel>.Fail("Invalid username or password", "AUTH_INVALID"));
     }
     [HttpGet("test")]
     public IActionResult Test()
@@ -32,5 +40,3 @@ public class AuthController : ControllerBase
         return Ok(new { Message = "Backend is working!" });
     }
 }
-
-public record LoginRequest(string Username, string Password);

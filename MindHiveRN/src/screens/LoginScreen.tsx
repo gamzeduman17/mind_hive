@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Alert, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text, TextInput, Button, Checkbox } from "react-native-paper";
-import { ROUTES } from "../constants/routes";
 import { login } from "../api/services/authService";
+import { LoginRequestModel } from "../models/authModels/Login";
 
 export default function LoginScreen({ navigation }: any) {
   const [userName, setUserName] = useState("");
@@ -24,8 +24,12 @@ export default function LoginScreen({ navigation }: any) {
       return;
     }
     try {
-      const result = await login(userName, password); 
-      Alert.alert("Success", `Welcome ${result.userName} (${result.role})`);
+      let req: LoginRequestModel = {
+        Username: userName,
+        Password: password
+      }
+      const result = await login(req);
+      Alert.alert("Success", `Welcome ${result.Username} (${result.Role})`);
       navigation.navigate("Home");
     } catch (err: any) {
       Alert.alert("Error", err.message || "Login failed");
@@ -72,7 +76,7 @@ export default function LoginScreen({ navigation }: any) {
           style={[styles.eyeIcon, { position: "absolute", right: 10, top: 15 }]}
           onPress={() => setShowPassword(!showPassword)}
         >
-          <Text>{showPassword ? "Hide" : "Show"}</Text> 
+          <Text>{showPassword ? "Hide" : "Show"}</Text>
           {/* change with eye later */}
         </TouchableOpacity>
       </View>
