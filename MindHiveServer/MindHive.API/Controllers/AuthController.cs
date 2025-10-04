@@ -25,6 +25,12 @@ public class AuthController : ControllerBase
 
         return Unauthorized(new { Message = "Invalid username or password" });
     }
+    [HttpGet("test")]
+    public IActionResult Test()
+    {
+        Console.WriteLine("Test endpoint reached!");
+        return Ok(new { Message = "Backend is working!" });
+    }
 }
 
 public record LoginRequest(string Username, string Password);

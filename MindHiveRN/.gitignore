@@ -89,3 +89,22 @@ ios/build/
 .expo/
 *.expo
 .DS_Store
+
+# .NET / Visual Studio build outputs
+bin/
+obj/
+
+# Build artifacts
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+*.sourcelink.json
+
+# User-specific files
+*.user
+*.suo
+
+# VS Code settings (optional, eğer paylaşmak istemezsen)
+.vscode/
