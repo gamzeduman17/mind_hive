@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Alert, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text, TextInput, Button, Checkbox } from "react-native-paper";
 import { login } from "../api/services/authService";
-import { LoginRequestModel } from "../models/authModels/Login";
+import { LoginRequestModel } from "../models/LoginModels";
 
 export default function LoginScreen({ navigation }: any) {
   const [userName, setUserName] = useState("");

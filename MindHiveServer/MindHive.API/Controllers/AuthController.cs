@@ -33,10 +33,19 @@ public class AuthController : ControllerBase
 
         return Unauthorized(BaseResponseModel<LoginResponseModel>.Fail("Invalid username or password", "AUTH_INVALID"));
     }
-    [HttpGet("test")]
-    public IActionResult Test()
+    [HttpPost("register")]
+    public IActionResult Register([FromBody] UserRegisterRequestModel request)
     {
-        Console.WriteLine("Test endpoint reached!");
-        return Ok(new { Message = "Backend is working!" });
+        
+        var user = _userService.Register(request);
+
+        var data = new LoginResponseModel
+        {
+            Username = user.Data.Username,
+            Role = user.Data.Role
+        };
+
+        return Ok(BaseResponseModel<LoginResponseModel>.Ok(data, "Registration successful"));
     }
+
 }

@@ -3,7 +3,6 @@ export interface LoginRequestModel {
     Password: string;
 }
 export interface LoginResponseModel {
-    message: string;
-    username: string;
-    role: string;
-}
+    Username: string;
+    Role: string;
+  }

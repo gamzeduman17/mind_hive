@@ -1,13 +1,9 @@
 using MindHive.Domain.Entities;
+using MindHive.Infrastructure;
 
 namespace MindHive.Domain.Repositories;
 
-public interface IUserRepository
+public interface IUserRepository:IRepository<User>
 {
-    User? GetById(Guid id);
     User? GetByUsername(string username);
-    IEnumerable<User> GetAll();
-    void Add(User user);
-    void Update(User user);
-    void Delete(Guid id);
 }
