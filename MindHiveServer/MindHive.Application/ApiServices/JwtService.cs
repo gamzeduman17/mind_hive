@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
+using Microsoft.Extensions.Configuration;
 
 namespace MindHive.Application.ApiServices;
 
@@ -12,10 +12,10 @@ public class JwtService
     private readonly int _jwtLifespanMinutes;
     private readonly HashSet<string> _blacklistedTokens = new();
 
-    public JwtService(string secret, int lifespanMinutes = 60)
+    public JwtService(IConfiguration configuration)
     {
-        _jwtSecret = secret;
-        _jwtLifespanMinutes = lifespanMinutes;
+        _jwtSecret = configuration["Jwt:Secret"] ?? "your-super-secret-key-that-is-at-least-32-characters-long";
+        _jwtLifespanMinutes = int.Parse(configuration["Jwt:LifespanMinutes"] ?? "60");
     }
 
     public string GenerateToken(string username, string role)

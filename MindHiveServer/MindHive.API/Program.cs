@@ -1,6 +1,5 @@
 using MindHive.Application.ApiServices;
-using MindHive.Domain.Repositories;
-using MindHive.Infrastructure.Repositories;
+using MindHive.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +9,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-// Dependency Injection registrations
-builder.Services.AddScoped<IUserRepository, InMemoryUserRepository>();
+// Add Infrastructure services (DbContext, Repositories)
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// Add Application services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddSingleton<JwtService>();
 

@@ -3,7 +3,7 @@ using MindHive.Infrastructure;
 
 namespace MindHive.Domain.Repositories;
 
-public interface IUserRepository:IRepository<User>
+public interface IUserRepository : IRepository<User>
 {
-    User? GetByUsername(string username);
+     Task<User?> GetByUsernameAsync(string username);
 }

@@ -1,13 +1,16 @@
+using System.Linq.Expressions;
+
 namespace MindHive.Infrastructure;
+
 
 public interface IRepository<TEntity> where TEntity : class
 {
-    IEnumerable<TEntity> GetAll();                      
-    TEntity? GetById(Guid id);                           
-    IEnumerable<TEntity> GetWhere(Func<TEntity, bool> predicate); 
-    void Add(TEntity entity);                            
-    void AddRange(IEnumerable<TEntity> entities);         
-    void Update(TEntity entity);                        
-    void Delete(TEntity entity);                          
-    void DeleteById(Guid id);                             
+    Task<IEnumerable<TEntity>> GetAllAsync();                                      
+    Task<TEntity?> GetByIdAsync(Guid id);                                         
+    Task<IEnumerable<TEntity>> GetWhereAsync(Expression<Func<TEntity, bool>> predicate); 
+    Task AddAsync(TEntity entity);                                                
+    Task AddRangeAsync(IEnumerable<TEntity> entities);                            
+    Task UpdateAsync(TEntity entity);                                             
+    Task DeleteAsync(TEntity entity);                                             
+    Task DeleteByIdAsync(Guid id);                                                
 }

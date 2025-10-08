@@ -1,39 +1,40 @@
+using MindHive.Application.ApiServiceInterfaces;
 using MindHive.Application.DTOs.Auth;
 using MindHive.Application.DTOs.CommonModels;
 using MindHive.Domain.Entities;
 using MindHive.Domain.Entities.Enums;
 using MindHive.Domain.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace MindHive.Application.ApiServices;
 
-public class UserService
+public class UserService: IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly string _jwtSecret;
 
-    public UserService(IUserRepository userRepository, string jwtSecret)
+    public UserService(IUserRepository userRepository, IConfiguration configuration)
     {
         _userRepository = userRepository;
-        _jwtSecret = jwtSecret;
+        _jwtSecret = configuration["Jwt:Secret"] ?? "your-super-secret-key-that-is-at-least-32-characters-long";
     }
 
-    public bool Login(string username, string password, out User? user)
+    public async Task<(bool success, User? user)> Login(string username, string password)
     {
-        user = _userRepository.GetByUsername(username);
+        var user = await _userRepository.GetByUsernameAsync(username);
         if (user != null && user.PasswordHash == password) //will be fixed
-            return true;
+            return (true, user);
 
-        user = null;
-        return false;
+        return (false, null);
     }
 
-    public bool UserExists(string username, string email)
+    public async Task<bool> UserExists(string username, string email)
     {
-        var users = _userRepository.GetWhere(x => x.Username == username || x.UserEmail == email);
+        var users = await _userRepository.GetWhereAsync(x => x.Username == username || x.UserEmail == email);
         return users.Any();
     }
 
-    public BaseResponseModel<LoginResponseModel> Register(UserRegisterRequestModel request)
+    public async Task<BaseResponseModel<LoginResponseModel>> RegisterAsync(UserRegisterRequestModel request)
     {
         // 1. Şifre ve confirmPassword kontrolü
         if (request.Password != request.ConfirmPassword)
@@ -43,7 +44,7 @@ public class UserService
             );
 
         // 2. Kullanıcı var mı kontrol et
-        if (UserExists(request.Username, request.Email))
+        if (await UserExists(request.Username, request.Email))
             return BaseResponseModel<LoginResponseModel>.Fail(
                 "Username or email already exists",
                 "USER_ALREADY_EXISTS"
@@ -59,7 +60,7 @@ public class UserService
             Role = Role.User
         };
 
-        _userRepository.Add(newUser);
+        await _userRepository.AddAsync(newUser);
 
         // 4. Response hazırlama
         var responseData = new LoginResponseModel
