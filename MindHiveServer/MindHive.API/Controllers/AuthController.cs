@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MindHive.Application.ApiServices;
 using MindHive.Application.DTOs.Auth;
@@ -8,11 +9,12 @@ namespace MindHive.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController : BaseController
 {
     private readonly UserService _userService;
 
-    public AuthController(UserService userService)
+    public AuthController(UserService userService, JwtService jwtService)
+        : base(jwtService)
     {
         _userService = userService;
     }
@@ -20,32 +22,22 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequestModel request)
     {
-        if (_userService.Login(request.Username, request.Password, out User? user))
+        if (_userService.Login(request.Username, request.Password, out var user))
         {
-            var data = new LoginResponseModel
-            {
-                Username = user.Username,
-                Role = user.Role
-            };
-
-            return Ok(BaseResponseModel<LoginResponseModel>.Ok(data, "Login successful"));
+            var token = _jwtService.GenerateToken(user!.Username, user.Role.ToString());
+            return Ok(new { Message = "Login successful", Username = user.Username, Role = user.Role, Token = token });
         }
 
-        return Unauthorized(BaseResponseModel<LoginResponseModel>.Fail("Invalid username or password", "AUTH_INVALID"));
+        return Unauthorized(new { Message = "Invalid username or password" });
     }
-    [HttpPost("register")]
-    public IActionResult Register([FromBody] UserRegisterRequestModel request)
+
+    [HttpPost("logout")]
+    [Authorize]
+    public IActionResult Logout()
     {
-        
-        var user = _userService.Register(request);
+        var token = GetCurrentToken();
+        if (token != null) _jwtService.BlacklistToken(token);
 
-        var data = new LoginResponseModel
-        {
-            Username = user.Data.Username,
-            Role = user.Data.Role
-        };
-
-        return Ok(BaseResponseModel<LoginResponseModel>.Ok(data, "Registration successful"));
+        return Ok(new { Message = "Logged out successfully" });
     }
-
 }

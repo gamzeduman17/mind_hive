@@ -1,8 +1,10 @@
 using MindHive.Domain.Entities;
+using MindHive.Domain.Repositories;
+using MindHive.Infrastructure;
 
-namespace MindHive.Domain.Repositories;
+namespace MindHive.Infrastructure.Repositories;
 
-public class InMemoryUserRepository : IUserRepository
+public class InMemoryUserRepository : IUserRepository, IRepository<User>
 {
     private readonly List<User> _users = new List<User>();
 
@@ -12,9 +14,16 @@ public class InMemoryUserRepository : IUserRepository
 
     public IEnumerable<User> GetAll() => _users;
 
+    public IEnumerable<User> GetWhere(Func<User, bool> predicate) => _users.Where(predicate);
+
     public void Add(User user)
     {
         _users.Add(user);
+    }
+
+    public void AddRange(IEnumerable<User> entities)
+    {
+        _users.AddRange(entities);
     }
 
     public void Update(User user)
@@ -29,7 +38,12 @@ public class InMemoryUserRepository : IUserRepository
         }
     }
 
-    public void Delete(Guid id)
+    public void Delete(User entity)
+    {
+        _users.Remove(entity);
+    }
+
+    public void DeleteById(Guid id)
     {
         var user = GetById(id);
         if (user != null)
