@@ -14,10 +14,15 @@ public class BaseController: ControllerBase
 
     protected string? GetCurrentToken()
     {
-        var authHeader = Request.Headers["Authorization"].ToString();
-        if (string.IsNullOrEmpty(authHeader)) return null;
-        return authHeader.Replace("Bearer ", "");
+        var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(authHeader)) return null;
+
+        if (!authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        return authHeader.Substring("Bearer ".Length).Trim();
     }
+
 
     protected bool ValidateCurrentToken()
     {

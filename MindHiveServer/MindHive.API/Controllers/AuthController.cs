@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MindHive.Application.ApiServiceInterfaces;
@@ -11,28 +12,32 @@ namespace MindHive.API.Controllers;
 public class AuthController : BaseController
 {
     private readonly IUserService _userService;
+    private readonly IJwtService _jwtService;
 
-    public AuthController(UserService userService, JwtService jwtService)
+    public AuthController(IUserService userService, JwtService jwtService)
         : base(jwtService)
     {
         _userService = userService;
+        _jwtService = jwtService;
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestModel request)
     {
-        var (success, user) = await _userService.Login(request.Username, request.Password);
-        if (success && user != null)
-        {
-            var token = _jwtService.GenerateToken(user.Username, user.Role.ToString());
-            return Ok(new { Message = "Login successful", Username = user.Username, Role = user.Role, Token = token });
-        }
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        var response = await _userService.Login(request);
 
-        return Unauthorized(new { Message = "Invalid username or password" });
+        if (!response.Success)
+            return Unauthorized(new { message = response?.Message ?? "Invalid username or password" });
+
+        return Ok(response);
     }
 
-    [HttpPost("logout")]
     [Authorize]
+    [HttpPost("logout")]
+   
     public IActionResult Logout()
     {
         var token = GetCurrentToken();
@@ -45,12 +50,30 @@ public class AuthController : BaseController
     public async Task<IActionResult> Register([FromBody] UserRegisterRequestModel request)
     {
         var result = await _userService.RegisterAsync(request);
-        
+
         if (result.Success)
         {
             return Ok(result);
         }
 
         return BadRequest(result);
+    }
+
+    [Authorize]
+    [HttpPut("updateUserProfile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UserUpdateRequestModel requestModel)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim))
+            return Unauthorized(new { message = "Invalid token" });
+
+        var userId = Guid.Parse(userIdClaim);
+
+        var response = await _userService.UpdateProfile(userId, requestModel);
+
+        if (!response.Success)
+            return BadRequest(response);
+
+        return Ok(response);
     }
 }

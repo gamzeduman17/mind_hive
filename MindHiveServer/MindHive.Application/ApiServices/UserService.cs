@@ -1,31 +1,52 @@
+using System.Text;
 using MindHive.Application.ApiServiceInterfaces;
 using MindHive.Application.DTOs.Auth;
 using MindHive.Application.DTOs.CommonModels;
+using MindHive.Application.DTOs.Dtos;
 using MindHive.Domain.Entities;
 using MindHive.Domain.Entities.Enums;
 using MindHive.Domain.Repositories;
-using Microsoft.Extensions.Configuration;
 
 namespace MindHive.Application.ApiServices;
 
 public class UserService: IUserService
 {
     private readonly IUserRepository _userRepository;
-    private readonly string _jwtSecret;
-
-    public UserService(IUserRepository userRepository, IConfiguration configuration)
+    private readonly IJwtService _jwtService;
+    public UserService(IUserRepository userRepository, IJwtService jwtService)
     {
         _userRepository = userRepository;
-        _jwtSecret = configuration["Jwt:Secret"] ?? "your-super-secret-key-that-is-at-least-32-characters-long";
+        _jwtService = jwtService;
     }
 
-    public async Task<(bool success, User? user)> Login(string username, string password)
+    public async Task<LoginResponseModel> Login(LoginRequestModel requestModel)
     {
-        var user = await _userRepository.GetByUsernameAsync(username);
-        if (user != null && user.PasswordHash == password) //will be fixed
-            return (true, user);
+        var user = await _userRepository.GetByUsernameAsync(requestModel.Username);
 
-        return (false, null);
+        if (user == null || user.PasswordHash != requestModel.Password) // hash kontrolünü ekle
+            return new LoginResponseModel
+            {
+                Success = false,
+                Message = "Invalid username or password"
+            };
+
+        // JWT token üretimi
+        var token = _jwtService.GenerateToken(user.Id, user.Username, requestModel.Role.ToString());
+
+        return new LoginResponseModel
+        {
+            Success = true,
+            Message = "Login successful",
+            UserToken = token,
+            User = new UserDto
+            {
+                Username = user.Username,
+                Role = user.Role,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt,
+                PasswordHash = user.PasswordHash,//not sure
+            }
+        };
     }
 
     public async Task<bool> UserExists(string username, string email)
@@ -65,8 +86,17 @@ public class UserService: IUserService
         // 4. Response hazırlama
         var responseData = new LoginResponseModel
         {
-            Username = newUser.Username,
-            Role = newUser.Role
+            Success = true,
+            Message = " Register successful",
+            UserToken = null,
+            User = new UserDto
+            {
+                Username = newUser.Username,
+                Role = newUser.Role,
+                CreatedAt = newUser.CreatedAt,
+                UpdatedAt = newUser.UpdatedAt,
+                PasswordHash = newUser.PasswordHash,//not sure
+            }
         };
 
         return BaseResponseModel<LoginResponseModel>.Ok(responseData, "User registered successfully");
@@ -75,6 +105,47 @@ public class UserService: IUserService
     private string HashPassword(string password)
     {
         // basit örnek, production'da daha güvenli hash kullan
-        return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(password));
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(password));
     }
+
+    public async Task<BaseResponseModel<UserDto>> UpdateProfile(Guid userId, UserUpdateRequestModel requestModel)
+    {
+        // 1️⃣ Kullanıcıyı bul
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            return BaseResponseModel<UserDto>.Fail("User not found.");
+        }
+
+        // 2️⃣ Alanları güncelle
+        user.Username = string.IsNullOrEmpty(requestModel.Username) ? user.Username : requestModel.Username;
+        user.UserEmail = string.IsNullOrEmpty(requestModel.UserEmail) ? user.UserEmail : requestModel.UserEmail;
+        user.Name = string.IsNullOrEmpty(requestModel.Name) ? user.Name : requestModel.Name;
+        user.Surname = string.IsNullOrEmpty(requestModel.Surname) ? user.Surname : requestModel.Surname;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        // 3️⃣ Şifre güncellenecekse
+        if (!string.IsNullOrEmpty(requestModel.Password))
+        {
+            if (requestModel.Password != requestModel.ConfirmPassword)
+                return BaseResponseModel<UserDto>.Fail("Passwords do not match.");
+
+            // TODO: Hash kullanıyorsan burada hashle
+            user.PasswordHash = requestModel.Password;
+        }
+
+        // 4️⃣ DB kaydı
+        await _userRepository.UpdateAsync(user);
+
+        // 5️⃣ Response dön
+        return BaseResponseModel<UserDto>.Ok(new UserDto
+        {
+            Username = user.Username,
+            UserEmail = user.UserEmail,
+            Name = user.Name,
+            Surname = user.Surname,
+            UpdatedAt = user.UpdatedAt
+        }, "Profile updated successfully.");
+    }
+
 }
