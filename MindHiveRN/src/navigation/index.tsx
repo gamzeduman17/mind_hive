@@ -1,11 +1,12 @@
 import { NavigationContainer } from "@react-navigation/native";
-import HomeScreen from "../screens/HomeScreen";
-import LoginScreen from "../screens/LoginScreen";
+
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RootStackParamList, ROUTES } from "../constants/routes";
-import ProfileScreen from "../screens/ProfileScreen";
+import ProfileScreen from "../screens/Profile/ProfileScreen";
 import { enableScreens } from 'react-native-screens';
-import SettingsScreen from "../screens/SettingScreen";
+import SettingsScreen from "../screens/Settings/SettingScreen";
+import HomeScreen from "../screens/Home/HomeScreen";
+import LoginScreen from "../screens/Auth/LoginScreen";
 
 enableScreens();
 
