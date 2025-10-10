@@ -5,7 +5,7 @@ using MindHive.Infrastructure.Data;
 
 namespace MindHive.Infrastructure.Repositories;
 
-public class UserRepository : Repository<User>, IUserRepository
+public class UserRepository : BaseRepository<User>, IUserRepository
 {
     public UserRepository(MindHiveDbContext context) : base(context)
     {

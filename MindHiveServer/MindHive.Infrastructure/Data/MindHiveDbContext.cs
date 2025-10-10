@@ -11,4 +11,5 @@ public class MindHiveDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<ErrorLog> ErrorLogs { get; set; }
 }

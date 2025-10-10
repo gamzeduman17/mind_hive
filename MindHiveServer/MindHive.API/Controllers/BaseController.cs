@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
+using MindHive.Application.ApiServiceInterfaces;
 using MindHive.Application.ApiServices;
 
 namespace MindHive.API.Controllers;
 
-public class BaseController: ControllerBase
+public class BaseController : ControllerBase
 {
-    protected readonly JwtService _jwtService;
+    protected readonly IJwtService _jwtService;
 
-    public BaseController(JwtService jwtService)
+    public BaseController(IJwtService jwtService)
     {
         _jwtService = jwtService;
     }
@@ -22,7 +23,6 @@ public class BaseController: ControllerBase
 
         return authHeader.Substring("Bearer ".Length).Trim();
     }
-
 
     protected bool ValidateCurrentToken()
     {

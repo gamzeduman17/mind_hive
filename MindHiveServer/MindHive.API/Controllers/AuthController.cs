@@ -14,8 +14,7 @@ public class AuthController : BaseController
     private readonly IUserService _userService;
     private readonly IJwtService _jwtService;
 
-    public AuthController(IUserService userService, JwtService jwtService)
-        : base(jwtService)
+    public AuthController(IUserService userService, IJwtService jwtService):base(jwtService)
     {
         _userService = userService;
         _jwtService = jwtService;

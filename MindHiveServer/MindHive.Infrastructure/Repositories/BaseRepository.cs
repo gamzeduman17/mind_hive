@@ -4,12 +4,12 @@ using MindHive.Infrastructure.Data;
 
 namespace MindHive.Infrastructure.Repositories;
 
-public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+public class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : class
 {
     protected readonly MindHiveDbContext _context;
     protected readonly DbSet<TEntity> _dbSet;
 
-    public Repository(MindHiveDbContext context)
+    public BaseRepository(MindHiveDbContext context)
     {
         _context = context;
         _dbSet = context.Set<TEntity>();
@@ -33,25 +33,21 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     public async Task AddAsync(TEntity entity)
     {
         await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
     }
 
     public async Task AddRangeAsync(IEnumerable<TEntity> entities)
     {
         await _dbSet.AddRangeAsync(entities);
-        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(TEntity entity)
     {
         _dbSet.Update(entity);
-        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(TEntity entity)
     {
         _dbSet.Remove(entity);
-        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteByIdAsync(Guid id)
@@ -62,4 +58,9 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
             await DeleteAsync(entity);
         }
     }
+    public async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
+    }
+
 }

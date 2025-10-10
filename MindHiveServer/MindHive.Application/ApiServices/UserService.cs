@@ -13,41 +13,58 @@ public class UserService: IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IJwtService _jwtService;
-    public UserService(IUserRepository userRepository, IJwtService jwtService)
+    private readonly IErrorLogService _errorLogService;
+    public UserService(IUserRepository userRepository, IJwtService jwtService,IErrorLogService errorLogService)
     {
         _userRepository = userRepository;
         _jwtService = jwtService;
+        _errorLogService = errorLogService;
     }
 
     public async Task<LoginResponseModel> Login(LoginRequestModel requestModel)
     {
-        var user = await _userRepository.GetByUsernameAsync(requestModel.Username);
+        try
+        {
+            var user = await _userRepository.GetByUsernameAsync(requestModel.Username);
 
-        if (user == null || user.PasswordHash != requestModel.Password) // hash kontrolünü ekle
+            if (user == null || user.PasswordHash != requestModel.Password)
+            {
+                return new LoginResponseModel
+                {
+                    Success = false,
+                    Message = "Invalid username or password"
+                };
+            }
+
+            // ✅ JWT token üret
+            var token = _jwtService.GenerateToken(user.Id, user.Username, user.Role.ToString());
+
+            return new LoginResponseModel
+            {
+                Success = true,
+                Message = "Login successful",
+                UserToken = token,
+                User = new UserDto
+                {
+                    Username = user.Username,
+                    Role = user.Role,
+                    CreatedAt = user.CreatedAt,
+                    UpdatedAt = user.UpdatedAt,
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            await _errorLogService.LogAsync(nameof(UserService), ex.Message, ex.StackTrace);
             return new LoginResponseModel
             {
                 Success = false,
-                Message = "Invalid username or password"
+                Message = "An unexpected error occurred. Please try again later."
             };
-
-        // JWT token üretimi
-        var token = _jwtService.GenerateToken(user.Id, user.Username, requestModel.Role.ToString());
-
-        return new LoginResponseModel
-        {
-            Success = true,
-            Message = "Login successful",
-            UserToken = token,
-            User = new UserDto
-            {
-                Username = user.Username,
-                Role = user.Role,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt,
-                PasswordHash = user.PasswordHash,//not sure
-            }
-        };
+        }
     }
+
+
 
     public async Task<bool> UserExists(string username, string email)
     {
@@ -82,6 +99,7 @@ public class UserService: IUserService
         };
 
         await _userRepository.AddAsync(newUser);
+        await _userRepository.SaveChangesAsync();
 
         // 4. Response hazırlama
         var responseData = new LoginResponseModel

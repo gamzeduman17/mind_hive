@@ -17,10 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(configuration);
 
 // 💡 Add Application Services
-builder.Services.AddScoped<UserService>();
-builder.Services.AddSingleton<JwtService>();
-builder.Services.AddSingleton<IJwtService, JwtService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddApplicationServices();
 
 // 🌍 Enable CORS (Allow all for development)
 builder.Services.AddCors(options =>

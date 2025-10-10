@@ -15,6 +15,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         _dbSet = context.Set<TEntity>();
     }
 
+    public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
     public async Task<IEnumerable<TEntity>> GetAllAsync()
         => await _dbSet.ToListAsync();
 
