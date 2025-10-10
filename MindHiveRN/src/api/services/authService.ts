@@ -5,12 +5,15 @@ import apiClient from "../apiClient";
 
 export async function login(req: LoginRequestModel) {
     try {
-        const response = await apiClient.post("auth/login", req);
+        const response = await apiClient.post("Auth/login", req);
         if (!response.data.Success) {
+            console.log("response",response);
             throw new Error(response.data.Message || "Login failed");
+          
         }
         return response.data.Data;
     } catch (error: any) {
+        console.log("response",error);
         if (error.response?.data?.Message) {
             throw new Error(error.response.data.Message);
         }
